@@ -132,7 +132,7 @@ def notebook_launcher(
             f"Unknown mixed_precision mode: {args.mixed_precision.lower()}. Choose between {PrecisionType.list()}."
         )
 
-    if (in_colab or in_kaggle) and (os.environ.get("TPU_NAME", None) is not None):
+    if (in_colab or in_kaggle) and (os.environ.get("TPU_WORKER_ID", None) is not None):
         # TPU launch
         import torch_xla.distributed.xla_multiprocessing as xmp
 
@@ -145,7 +145,7 @@ def notebook_launcher(
         if num_processes is None:
             num_processes = 8
 
-        launcher = PrepareForLaunch(function, distributed_type="TPU")
+        launcher = PrepareForLaunch(function, distributed_type="XLA")
         print(f"Launching a training on {num_processes} TPU cores.")
         xmp.spawn(launcher, args=args, nprocs=num_processes, start_method="fork")
     elif in_colab and get_gpu_info()[1] < 2:
